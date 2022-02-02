@@ -1,0 +1,60 @@
+import numpy
+import pandas as pd
+
+#to convert from dgree to rad (x/180)*pi
+# O1 and O2 are the variables of the 2 DoF system
+
+def for_k(O1,O2):
+
+    O1_degree = O1
+    O2_degree = O2
+    
+    O1=(O1/180)*numpy.pi;
+    O2=(O2/180)*numpy.pi;
+    
+    a1=5;    #cm
+    a2=5;
+    a3=5;
+    a4=5;
+    
+    I=[[1,0,0],[0,1,0],[0,0,1]];
+    I=numpy.matrix(I);
+    
+    R2_1=[[numpy.cos(O1), -numpy.sin(O1), 0], [numpy.sin(O1), numpy.cos(O1), 0], [0,0,1]];
+    R2_1=numpy.matrix(R2_1);
+    R2_1=numpy.dot(I,R2_1);
+    R3_2=[[numpy.cos(O2), -numpy.sin(O2), 0], [numpy.sin(O2), numpy.cos(O2), 0], [0,0,1]];
+    R3_2=numpy.matrix(R3_2);
+    R3_2=numpy.dot(I,R3_2);
+    
+    dv2_1=[[a2*numpy.cos(O1)],[a2*numpy.sin(O1)],[a1]];
+    dv2_1=numpy.matrix(dv2_1);
+    dv3_2=[[a4*numpy.cos(O2)],[a4*numpy.sin(O2)],[a3]];
+    dv3_2=numpy.matrix(dv3_2);
+    
+####################################################
+    H2_1=numpy.concatenate((R2_1,dv2_1), axis=1);
+    H2_1=numpy.concatenate((H2_1,[[0,0,0,1]]), axis=0);
+    H3_2=numpy.concatenate((R3_2,dv3_2), axis=1);
+    H3_2=numpy.concatenate((H3_2,[[0,0,0,1]]), axis=0);
+    H3_1=numpy.dot(H2_1,H3_2);
+    H3_1=numpy.matrix(H3_1)
+
+
+
+    str1 = str(O1_degree) + " "+ str(O2_degree)+ " " +str(H3_1[0,3]) + " "+ str(H3_1[1,3])
+    return str1
+
+f1 = open('Mydata.txt', 'a')
+
+
+arr = [0,3,5,7,10,12,15,18,20,23,25,28,30,33,35,38,40,43,45,48,50,53,55,58,60.63,65,68,70,73,75,78,80,83,85,88,90,93,95,98,100,103,105,108,110,113,115,118,120,123,125,128,130,133,135,138,140,143,145,148,150,153,155,158,160,163,165,168,170,173,175,178,180]
+
+for i in arr:
+    for j in arr:
+        f1.write(for_k(i,j))
+        f1.write("\n")
+f1.close()
+
+read_file = pd.read_csv (r'Mydata.txt')
+read_file.to_csv (r'datarob', index=None)
